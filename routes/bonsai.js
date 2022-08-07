@@ -4,14 +4,25 @@ const router = express.Router()
 
 router.get("/bonsai", (req, res) => {
 
-    let x = 49, y = 23
+    let x = 50, y = 23
+    let width = 500
+    let height = 500
 
-    /*
-    let drawer = ""
-    for(var i = 0; i < x; i++)
-        for(var j = 0; j < y; j++)
-            drawer += `<text x="${i * 9.61}" y="${j * 21}" class="text" >/</text>`
-            */
+    let offsetX = 10, offsetY = 25
+
+    // char dimension size = 9.61 x 21
+    const charX = 9.61, charY = 21
+
+    if(!isNaN(req.query.width)) {
+        x = Math.floor(req.query.width / charX)
+        offsetX = Math.round(( (req.query.width - (x * charX)) / 2 ) * 100) / 100
+        width = req.query.width
+    }
+    if(!isNaN(req.query.height)) {
+        y = Math.floor(req.query.height / charY)
+        offsetY = Math.round( ( (req.query.height - (y * charY)) / 2 + 16 ) * 100 ) / 100
+        height = req.query.height
+    }
 
     //sonokai
     const bonsai = require("../common/jbonsai")
@@ -41,12 +52,20 @@ router.get("/bonsai", (req, res) => {
 
     let drawer = init.render()
 
+    /*
+    //check screen
+    drawer = ""
+    for(var i = 0; i < x; i++)
+        for(var j = 0; j < y; j++)
+            drawer += `<text x="${i * 9.61}" y="${j * 21}" class="text" style="opacity:1">/</text>`
+            */
+
     res.setHeader("Content-Type", "image/svg+xml")
     res.send(`
 <svg
-        width="500"
-        height="500"
-        viewBox="0 0 500 500"
+        width="${width}"
+        height="${height}"
+        viewBox="0 0 ${width} ${height}"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
@@ -74,10 +93,10 @@ router.get("/bonsai", (req, res) => {
         }
            
     </style>
-    <rect xmlns="http://www.w3.org/2000/svg" x="0.5" y="0.5" rx="4.5" height="99%" stroke="#b7bdf8" width="494" fill="#2c2e34" opacity="1" stroke-opacity="0.6"/>
-    <g transform="translate(0, 0)">
+    <rect xmlns="http://www.w3.org/2000/svg" x="0" y="0" rx="4.5" height="100%" stroke="#b7bdf8" width="100%" fill="#2c2e34" opacity="1" stroke-opacity="0.6"/>
+    <g>
         <!--rect xmlns="http://www.w3.org/2000/svg" x="0" y="0" height="400" width="400" fill="#ffffff" opacity="0.8"/-->
-        <g transform="translate(10, 20)">
+        <g transform="translate(${offsetX}, ${offsetY})">
             ${drawer}
         </g>
     </g>
