@@ -39,12 +39,12 @@ router.get("/bonsai", (req, res) => {
         init._config.timeStep = req.query.time
 
     if(!isNaN(req.query.life)) {
-        if(req.query.life <= 200 && req.query.life >= 0)
+        if(req.query.life <= 100 && req.query.life >= 0)
             init._config.lifeStart = req.query.life
     }
 
     if(!isNaN(req.query.multiplier)) {
-        if(req.query.multiplier <= 20 && req.query.multiplier >= 0)
+        if(req.query.multiplier <= 10 && req.query.multiplier >= 0)
             init._config.lifeStart = req.query.multiplier
     }
 
