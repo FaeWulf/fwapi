@@ -16,6 +16,8 @@ module.exports = class bonsai {
             seed: "random",
             stop: false,
 
+            shootCounter: 0,
+
             timeWait: 4,
             timeStep: 50, //milisec
             totalTime: 0,
@@ -231,7 +233,7 @@ module.exports = class bonsai {
                 else return "#df9318";
 
             case "dying":
-                if (this.rand() % 10 == 5) return "#fc5d7c" //bold 
+                //if (this.rand() % 10 == 5) return "#fc5d7c" //bold 
                 if (this.rand() % 5 == 2) return "#f39660" //bold 
                 else return "#e7c664"
 
@@ -333,14 +335,15 @@ module.exports = class bonsai {
 
                     //if (config.verbosity) mvwprintw(objects->treeWin, 4, 5, "shoots: %02d", myCounters->shoots);
 
+                    this._config.shootCounter++
+
                     // create shoot
 
                     let chooseBranch = [
                         "shootLeft",
-                        "shootRight",
-                        //"trunk",
+                        "shootRight"
                     ]
-                    this.branch(y, x, chooseBranch[this.rollDice(2) - 1], shootLife);
+                    this.branch(y, x, chooseBranch[this._config.shootCounter % 2], shootLife);
                 }
             }
             shootCooldown--;
@@ -367,6 +370,8 @@ module.exports = class bonsai {
         if (this._config.seed != "random") {
             this.seed(this._config.seed)
         }
+
+        this._config.shootCounter = this.rand()
 
         this.drawBase(this.rollDice(2))
         this.branch(this._y - 5, Math.floor(this._x / 2) - 1, "trunk", this._config.lifeStart);
