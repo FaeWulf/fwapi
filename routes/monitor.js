@@ -4,8 +4,14 @@ const router = express.Router()
 
 module.exports = router.get("/monitor", async (req, res) => { 
 
-    let temp = await sysInfo.osInfo()
+    let respond = { }
 
-    console.log(temp)
+    respond.osInfo = await sysInfo.osInfo()
+    respond.cpuCurrentSpeed = await sysInfo.cpuCurrentSpeed()
+    respond.processes = await sysInfo.processes()
 
+
+    console.log(respond)
+
+    res.json(respond)
 })
