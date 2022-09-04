@@ -45,13 +45,13 @@ module.exports = class bonsai {
         if (x < 0 || x >= this._x || y < 0 || y >= this._y)
             return
 
-        if (char.length < 1 || char == " ")
+        if(char.length < 1 || char == " ")
             return
 
         if (char.length == 1) {
-
+            
             //retrun if overlap current bonsai leaves
-            if (this._config.leaves.includes(this.getAt(x, y)))
+            if(this._config.leaves.includes(this.getAt(x,y)))
                 return
 
             if (!this._buffer.find(K => K.x == x && K.y == y)) {
@@ -89,13 +89,13 @@ module.exports = class bonsai {
     }
 
     getAt(x, y) {
-        let result = ""
-        for (let i = 0; i < this._buffer.length; i++) {
+        let  result = ""
+        for(let i = 0; i < this._buffer.length; i++) {
             let current = this._buffer[i]
-            if (current.x == x && current.y == y)
+            if(current.x == x && current.y == y)
                 result = current.char
         }
-        return result
+        return result 
     }
 
     drawBase(baseType = 1) {
@@ -279,131 +279,6 @@ module.exports = class bonsai {
         return branchStr;
     }
 
-    start(y, x, type, life) {
-        this._stack = []
-
-        this._stack.push({
-            x: x,
-            y: y,
-            type: type,
-            life: life
-        })
-
-        while (this._stack.length > 0) {
-            let current_stack = this._stack.pop()
-
-            let age = 0;
-            let shootCooldown = this._config.multiplier //multiplier;
-
-            while (current_stack.life > 0) {
-                // quit if a key pressed
-                if (this._config.stop) {
-                    setTimeOuts.forEach(E => clearTimeout(E))
-                    setTimeOuts = []
-                    return
-                }
-
-                current_stack.life--;		// decrement remaining life counter
-                age = this._config.lifeStart - current_stack.life;
-
-                let { dx, dy } = this.setDeltas(current_stack.type, current_stack.life, age, this._config.multiplier)
-
-                if (dy > 0 && current_stack.y > (this._y - 2)) dy--; // reduce dy if too close to the ground
-
-                // near-dead branch should branch into a lot of leaves
-                if (current_stack.life < 3) {
-                    //this.branch(y, x, "dead", current_stack.life);
-                    this._stack.push({
-                        x: current_stack.x,
-                        y: current_stack.y,
-                        type: "dead",
-                        life: current_stack.life
-                    })
-                }
-
-                // dying trunk should branch into a lot of leaves
-                else if (current_stack.type == 0 && current_stack.life < (this._config.multiplier + 2)) {
-                    //this.branch(y, x, "dying", life);
-                    this._stack.push({
-                        x: current_stack.x,
-                        y: current_stack.y,
-                        type: "dying",
-                        life: current_stack.life
-                    })
-                }
-
-                // dying shoot should branch into a lot of leaves
-                else if ((current_stack.type == "shootLeft" || current_stack.type == "shootRight") && current_stack.life < (this._config.multiplier + 2)) {
-                    //this.branch(y, x, "dying", life);
-                    this._stack.push({
-                        x: current_stack.x,
-                        y: current_stack.y,
-                        type: "dying",
-                        life: current_stack.life
-                    })
-                }
-
-                // trunks should re-branch if not close to ground AND either randomly, or upon every <multiplier> steps
-                else if (current_stack.type == "trunk" && (((this.rand() % 3) == 0) || (current_stack.life % this._config.multiplier == 0))) {
-
-                    // if trunk is branching and not about to die, create another trunk with random life
-                    if ((this.rand() % 8 == 0) && life > 7) {
-                        shootCooldown = this._config.multiplier * 2;	// reset shoot cooldown
-                        //this.branch(y, x, "trunk", life + (this.rand() % 5 - 2));
-                        this._stack.push({
-                            x: current_stack.x,
-                            y: current_stack.y,
-                            type: "trunk",
-                            life: current_stack.life + (this.rand() % 5 - 2)
-                        })
-                    }
-
-                    // otherwise create a shoot
-                    else if (shootCooldown <= 0) {
-                        shootCooldown = this._config.multiplier * 2;	// reset shoot cooldown
-
-                        let shootLife = (current_stack.life + this._config.multiplier);
-
-                        //if (config.verbosity) mvwprintw(objects->treeWin, 4, 5, "shoots: %02d", myCounters->shoots);
-
-                        this._config.shootCounter++
-
-                        // create shoot
-
-                        let chooseBranch = [
-                            "shootLeft",
-                            "shootRight"
-                        ]
-                        //this.branch(y, x, chooseBranch[this._config.shootCounter % 2], shootLife);
-                        this._stack.push({
-                            x: current_stack.x,
-                            y: current_stack.y,
-                            type: chooseBranch[this._config.shootCounter % 2],
-                            life: shootLife 
-                        })
-                    }
-                }
-
-                shootCooldown--;
-
-                current_stack.x += dx;
-                current_stack.y += dy;
-
-                let color = this.chooseColor(current_stack.type);
-
-                // choose string to use for this branch
-                let branchStr = this.chooseString(current_stack.type, current_stack.life, dx, dy);
-
-                if (!this._config.leaves.includes(this.getAt(current_stack.x, current_stack.y)) || this._config.leaves.includes(branchStr)) {
-
-                    this.DrawAt(Math.floor(current_stack.x), current_stack.y, branchStr, color)
-                    this._config.totalTime += this._config.timeStep
-                }
-
-            }
-        }
-    }
-
     branch(y, x, type, life) {
 
         let age = 0;
@@ -418,6 +293,8 @@ module.exports = class bonsai {
                 return
             }
 
+
+
             life--;		// decrement remaining life counter
             age = this._config.lifeStart - life;
 
@@ -426,9 +303,8 @@ module.exports = class bonsai {
             if (dy > 0 && y > (this._y - 2)) dy--; // reduce dy if too close to the ground
 
             // near-dead branch should branch into a lot of leaves
-            if (life < 3) {
+            if (life < 3)
                 this.branch(y, x, "dead", life);
-            }
 
             // dying trunk should branch into a lot of leaves
             else if (type == 0 && life < (this._config.multiplier + 2))
@@ -439,6 +315,10 @@ module.exports = class bonsai {
                 this.branch(y, x, "dying", life);
 
             // trunks should re-branch if not close to ground AND either randomly, or upon every <multiplier> steps
+            /* else if (type == 0 && ( \ */
+            /* 		(this.rand() % (conf.multiplier)) == 0 || \ */
+            /* 		(life > conf.multiplier && life % conf.multiplier == 0) */
+            /* 		) ) { */
             else if (type == "trunk" && (((this.rand() % 3) == 0) || (life % this._config.multiplier == 0))) {
 
                 // if trunk is branching and not about to die, create another trunk with random life
@@ -466,7 +346,6 @@ module.exports = class bonsai {
                     this.branch(y, x, chooseBranch[this._config.shootCounter % 2], shootLife);
                 }
             }
-
             shootCooldown--;
 
             x += dx;
@@ -477,7 +356,8 @@ module.exports = class bonsai {
             // choose string to use for this branch
             let branchStr = this.chooseString(type, life, dx, dy);
 
-            if (!this._config.leaves.includes(this.getAt(x, y)) || this._config.leaves.includes(branchStr)) {
+            if ( !this._config.leaves.includes(this.getAt(x, y)) || this._config.leaves.includes(branchStr))
+            {
 
                 this.DrawAt(Math.floor(x), y, branchStr, color)
                 this._config.totalTime += this._config.timeStep
@@ -503,7 +383,7 @@ module.exports = class bonsai {
         this._buffer.forEach(E => {
             result += `<text x="${E.x * 9.61}" y="${E.y * 21}" class="text" 
             style="fill: ${E.color};animation: show 0.1s ${E.despawn_tick == -1 ? "" : ", hide 0.1s"};animation-delay: ${E.tick / 1000}s ${E.despawn_tick == -1 ? "" : ", " + (E.despawn_tick / 1000) + "s"};animation-fill-mode: forwards;">${E.char == "&" ? "&amp;" : E.char}</text>`
-
+            
         })
 
         return result
@@ -511,3 +391,5 @@ module.exports = class bonsai {
 
 
 }
+
+
