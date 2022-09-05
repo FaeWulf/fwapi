@@ -286,15 +286,16 @@ module.exports = class bonsai {
             x: x,
             y: y,
             type: type,
-            life: life
+            life: life,
+            age: 0,
+            shootCooldown: this._config.multiplier
         })
 
         while (this._stack.length > 0) {
-            let current_stack = this._stack.pop()
+            let current_stack = this._stack[this._stack.length - 1]
 
-            let age = 0;
-            let shootCooldown = this._config.multiplier //multiplier;
-
+            //let age = 0;
+            //let shootCooldown = this._config.multiplier //multiplier;
             while (current_stack.life > 0) {
                 // quit if a key pressed
                 if (this._config.stop) {
@@ -304,9 +305,9 @@ module.exports = class bonsai {
                 }
 
                 current_stack.life--;		// decrement remaining life counter
-                age = this._config.lifeStart - current_stack.life;
+                current_stack.age = this._config.lifeStart - current_stack.life;
 
-                let { dx, dy } = this.setDeltas(current_stack.type, current_stack.life, age, this._config.multiplier)
+                let { dx, dy } = this.setDeltas(current_stack.type, current_stack.life, current_stack.age, this._config.multiplier)
 
                 if (dy > 0 && current_stack.y > (this._y - 2)) dy--; // reduce dy if too close to the ground
 
@@ -317,19 +318,25 @@ module.exports = class bonsai {
                         x: current_stack.x,
                         y: current_stack.y,
                         type: "dead",
-                        life: current_stack.life
+                        life: current_stack.life,
+                        age: 0,
+                        shootCooldown: this._config.multiplier
                     })
+                    //continue;
                 }
 
                 // dying trunk should branch into a lot of leaves
-                else if (current_stack.type == 0 && current_stack.life < (this._config.multiplier + 2)) {
+                else if (current_stack.type == "trunk" && current_stack.life < (this._config.multiplier + 2)) {
                     //this.branch(y, x, "dying", life);
                     this._stack.push({
                         x: current_stack.x,
                         y: current_stack.y,
                         type: "dying",
-                        life: current_stack.life
+                        life: current_stack.life,
+                        age: 0,
+                        shootCooldown: this._config.multiplier
                     })
+                    //continue;
                 }
 
                 // dying shoot should branch into a lot of leaves
@@ -339,28 +346,34 @@ module.exports = class bonsai {
                         x: current_stack.x,
                         y: current_stack.y,
                         type: "dying",
-                        life: current_stack.life
+                        life: current_stack.life,
+                        age: 0,
+                        shootCooldown: this._config.multiplier
                     })
+                    //continue;
                 }
 
                 // trunks should re-branch if not close to ground AND either randomly, or upon every <multiplier> steps
                 else if (current_stack.type == "trunk" && (((this.rand() % 3) == 0) || (current_stack.life % this._config.multiplier == 0))) {
 
                     // if trunk is branching and not about to die, create another trunk with random life
-                    if ((this.rand() % 8 == 0) && life > 7) {
-                        shootCooldown = this._config.multiplier * 2;	// reset shoot cooldown
+                    if ((this.rand() % 8 == 0) && current_stack.life > 7) {
+                        current_stack.shootCooldown = this._config.multiplier * 2;	// reset shoot cooldown
                         //this.branch(y, x, "trunk", life + (this.rand() % 5 - 2));
                         this._stack.push({
                             x: current_stack.x,
                             y: current_stack.y,
                             type: "trunk",
-                            life: current_stack.life + (this.rand() % 5 - 2)
+                            life: current_stack.life + (this.rand() % 5 - 2),
+                            age: 0,
+                            shootCooldown: this._config.multiplier
                         })
+                        //continue;
                     }
 
                     // otherwise create a shoot
-                    else if (shootCooldown <= 0) {
-                        shootCooldown = this._config.multiplier * 2;	// reset shoot cooldown
+                    else if (current_stack.shootCooldown <= 0) {
+                        current_stack.shootCooldown = this._config.multiplier * 2;	// reset shoot cooldown
 
                         let shootLife = (current_stack.life + this._config.multiplier);
 
@@ -379,12 +392,15 @@ module.exports = class bonsai {
                             x: current_stack.x,
                             y: current_stack.y,
                             type: chooseBranch[this._config.shootCounter % 2],
-                            life: shootLife 
+                            life: shootLife,
+                            age: 0,
+                            shootCooldown: this._config.multiplier
                         })
+                        //continue;
                     }
                 }
 
-                shootCooldown--;
+                current_stack.shootCooldown--;
 
                 current_stack.x += dx;
                 current_stack.y += dy;
@@ -401,6 +417,9 @@ module.exports = class bonsai {
                 }
 
             }
+
+            //remove stack after it done
+            this._stack.pop()
         }
     }
 
@@ -431,7 +450,7 @@ module.exports = class bonsai {
             }
 
             // dying trunk should branch into a lot of leaves
-            else if (type == 0 && life < (this._config.multiplier + 2))
+            else if (type == "trunk" && life < (this._config.multiplier + 2))
                 this.branch(y, x, "dying", life);
 
             // dying shoot should branch into a lot of leaves
@@ -494,7 +513,8 @@ module.exports = class bonsai {
         this._config.shootCounter = this.rand()
 
         this.drawBase(this.rollDice(2))
-        this.branch(this._y - 5, Math.floor(this._x / 2) - 1, "trunk", this._config.lifeStart);
+        //this.branch(this._y - 5, Math.floor(this._x / 2) - 1, "trunk", this._config.lifeStart);
+        this.start(this._y - 5, Math.floor(this._x / 2) - 1, "trunk", this._config.lifeStart);
     }
 
     render() {
