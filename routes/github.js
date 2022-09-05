@@ -39,23 +39,25 @@ router.get("/github", (req, res) => {
     res.send(`
    <svg
         width="500"
-        height="500"
-        viewBox="0 0 500 500"
+        height="400"
+        viewBox="0 0 500 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
       >
     <style>
+
        .title {
-            font: 18px "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "monospace";
+            font: 18px Consolas, monaco, monospace;
             fill: #8aadf4;
        }
+
         .text {
-            font: 14px "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "monospace";
+            font: 14px Consolas, monaco, monospace;
             fill: #cad3f5;
        }
         .chart {
-            font: 12px "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "monospace";
+            font: 12px Consolas, monaco, monospace;
             fill: #cad3f5;
        }
        .bold {
@@ -66,7 +68,7 @@ router.get("/github", (req, res) => {
        }
            
     </style>
-    <rect xmlns="http://www.w3.org/2000/svg" x="0.5" y="0.5" rx="4.5" height="99%" stroke="#b7bdf8" width="494" fill="#24273a" opacity="0.8" stroke-opacity="0.6"/>
+    <rect xmlns="http://www.w3.org/2000/svg" x="0" y="0" rx="4.5" height="100%" stroke="#b7bdf8" width="100%" fill="#2c2e34" opacity="1" stroke-opacity="0.6"/>
     <g transform="translate(20, 35)">
       <text x="0" y="0" class="title bold">Faewulf's Github Status</text>
     </g>    
