@@ -1,8 +1,10 @@
 const express = require("express")
 const ratelimit = require("express-rate-limit")
+const fs = require("fs")
 
 const app = express()
 const port = 3000;
+const routePath = "./routes/"
 
 const limiter = ratelimit({
     windowMs: 1000,
@@ -12,16 +14,19 @@ const limiter = ratelimit({
 })
 
 app.use(express.json({limit: "1mb"}))
-
-const apiGithub = require('./routes/github')
-const apiBonsai = require('./routes/bonsai')
-const apiMonitor = require('./routes/monitor')
-// route
-
 app.use(limiter)
-app.use("/api", apiGithub)
-app.use("/api", apiBonsai)
-app.use("/api", apiMonitor)
+
+// route
+fs.readdirSync(routePath).forEach(E => {
+
+    try {
+        let route = require(routePath + E) 
+        app.use("/api", route)
+        console.log("loaded " + E)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 app.listen(port,  () => {
     console.log("Listening on port " + port + "...")
