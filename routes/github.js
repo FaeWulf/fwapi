@@ -5,7 +5,17 @@ const router = express.Router()
 router.get("/github", (req, res) => {
     let data = require("../stats.json")
 
-    data.langs.sort((a,b) => b.value - a.value)
+    data.langs.sort((a, b) => b.value - a.value)
+
+    // ?recent=true
+    if (req.query.recent) {
+        let string = ""
+        data.recentlangs.forEach(K => {
+            string += `${K.key} (${K.value}%), `
+        })
+        string = string.slice(0, string.length - 2)
+        return res.send(string)
+    }
 
     let max = data.langs[0].value
 
@@ -13,7 +23,7 @@ router.get("/github", (req, res) => {
     let y = 0
     let total = 0
     data.langs.forEach((E, index) => {
-        if(index > 4) {
+        if (index > 4) {
             total += E.value
             return
         }
@@ -26,7 +36,7 @@ router.get("/github", (req, res) => {
         y += 25
     })
 
-    if(total != 0) {
+    if (total != 0) {
         let bar = "|".repeat(Math.ceil(total * 35 / max))
         els += `
             <text x="0" y="${y}" class="text bold">Other</text>

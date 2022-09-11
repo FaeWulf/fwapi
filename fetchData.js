@@ -79,7 +79,7 @@ const body3 = {
   "query": `
            {
   user(login: "FaeWulf") {
-    repositories(orderBy: {field: UPDATED_AT, direction: DESC}, first: 2) {
+    repositories(orderBy: {field: PUSHED_AT, direction: DESC}, first: 2) {
       nodes {
         name
         defaultBranchRef {
@@ -92,6 +92,7 @@ const body3 = {
                   edges {
                     node {
                       name
+                      color
                     }
                     size
                   }
@@ -139,7 +140,7 @@ async function wrapper() {
       throw new Error("Fetching error: " + res.status)
     return res.json()
   })
-  
+
 
   let totalSize = 0
   let langs = {}
@@ -199,13 +200,41 @@ async function wrapper() {
   })
 
   let latestCommit = gitLatestCommit.data.user
+  let recentLang = {}
+  let totalCountLatest = 0
+  let recentlang_colors = {}
+
 
   latestCommit.repositories.nodes.forEach(E => {
 
-    
-
+    E.defaultBranchRef.target.repository.languages.edges.forEach(lang => {
+      if (!recentLang[lang.node.name])
+        recentLang[lang.node.name] = 0
+      recentLang[lang.node.name] += lang.size
+      totalCountLatest += lang.size
+      recentlang_colors[lang.node.name] = lang.node.color
+    })
   })
-  
+
+  let recentLang_Array = []
+  let recentLangKeys = Object.keys(recentLang)
+  let totalPercent_recentLang = 0
+
+  for (let i = 0; i < recentLangKeys.length; i++) {
+    let percent
+
+    //last element will subtract from total percent, rounding to 100%
+    if (i == recentLangKeys.length - 1)
+      percent = Math.round((100 - totalPercent_recentLang) * 100) / 100
+    else
+      percent = Math.round(recentLang[recentLangKeys[i]] * 10000 / totalCountLatest) / 100
+    totalPercent_recentLang += percent
+    recentLang_Array.push({
+      "key": recentLangKeys[i],
+      "value": percent,
+      "color": recentlang_colors[recentLangKeys[i]]
+    })
+  }
 
   fs.writeFile(
     'stats.json',
@@ -217,7 +246,8 @@ async function wrapper() {
       "issuesTotal": issuesTotal,
       "contriButedTo": contriButedTo,
       "prTotal": prTotal,
-      "langs": langUsed
+      "langs": langUsed,
+      "recentlangs": recentLang_Array
     }),
     'utf8',
     (e) => {
