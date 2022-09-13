@@ -8,7 +8,7 @@ router.get("/github", (req, res) => {
     data.langs.sort((a, b) => b.value - a.value)
 
     // ?recent=true
-    if (req.query.recent) {
+    if (req.query.recent == true) {
         let string = ""
         data.recentlangs.forEach(K => {
             string += `${K.key} (${K.value}%), `
