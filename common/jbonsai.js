@@ -51,7 +51,12 @@ module.exports = class bonsai {
         if (char.length == 1) {
 
             //retrun if overlap current bonsai leaves
+            /*
             if (this._config.leaves.includes(this.getAt(x, y)))
+                return
+            */
+
+            if (this.getAt(x, y) != "")
                 return
 
             if (!this._buffer.find(K => K.x == x && K.y == y)) {
@@ -229,7 +234,7 @@ module.exports = class bonsai {
             case "trunk":
             case "shootLeft":
             case "shootRight":
-                if (this.rand() % 2 == 0) return " #f39660"; //bold later
+                if (this.rand() % 2 == 0) return "#f39660"; //bold later
                 else return "#df9318";
 
             case "dying":
@@ -309,7 +314,7 @@ module.exports = class bonsai {
 
                 let { dx, dy } = this.setDeltas(current_stack.type, current_stack.life, current_stack.age, this._config.multiplier)
 
-                if (dy > 0 && current_stack.y > (this._y - 2)) dy--; // reduce dy if too close to the ground
+                if (dy > 0 && current_stack.y > (this._y - 10)) dy--; // reduce dy if too close to the ground
 
                 // near-dead branch should branch into a lot of leaves
                 if (current_stack.life < 3) {
@@ -377,8 +382,6 @@ module.exports = class bonsai {
 
                         let shootLife = (current_stack.life + this._config.multiplier);
 
-                        //if (config.verbosity) mvwprintw(objects->treeWin, 4, 5, "shoots: %02d", myCounters->shoots);
-
                         this._config.shootCounter++
 
                         // create shoot
@@ -410,11 +413,10 @@ module.exports = class bonsai {
                 // choose string to use for this branch
                 let branchStr = this.chooseString(current_stack.type, current_stack.life, dx, dy);
 
-                if (!this._config.leaves.includes(this.getAt(current_stack.x, current_stack.y)) || this._config.leaves.includes(branchStr)) {
-
-                    this.DrawAt(Math.floor(current_stack.x), current_stack.y, branchStr, color)
-                    this._config.totalTime += this._config.timeStep
-                }
+                //if (!this._config.leaves.includes(this.getAt(current_stack.x, current_stack.y)) || this._config.leaves.includes(branchStr)) {
+                this.DrawAt(Math.floor(current_stack.x), current_stack.y, branchStr, color)
+                this._config.totalTime += this._config.timeStep
+                //}
 
             }
 
@@ -423,6 +425,7 @@ module.exports = class bonsai {
         }
     }
 
+    /*
     branch(y, x, type, life) {
 
         let age = 0;
@@ -503,6 +506,7 @@ module.exports = class bonsai {
             }
         }
     }
+    */
 
 
     growTree() {

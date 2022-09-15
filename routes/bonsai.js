@@ -61,6 +61,7 @@ router.get("/bonsai", (req, res) => {
             */
 
     res.setHeader("Content-Type", "image/svg+xml")
+    res.setHeader("Cache-Control", "no-cache")
     res.send(`
 <svg
         width="${width}"
