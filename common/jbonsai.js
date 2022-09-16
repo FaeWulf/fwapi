@@ -56,9 +56,6 @@ module.exports = class bonsai {
                 return
             */
 
-            if (this.getAt(x, y) != "")
-                return
-
             if (!this._buffer.find(K => K.x == x && K.y == y)) {
                 this._buffer.push({
                     x: x,
