@@ -21,7 +21,7 @@ fs.readdirSync(routePath).forEach(E => {
 
     try {
         let route = require(routePath + E) 
-        app.use("/api", route)
+        app.use("/", route)
         console.log("loaded " + E)
     } catch (error) {
         console.log(error)
