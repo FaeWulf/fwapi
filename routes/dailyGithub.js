@@ -1,9 +1,12 @@
 const express = require("express")
+const fs = require('fs')
+const path = require('path')
 
 const router = express.Router()
 
 router.get("/daily", (req, res) => {
-    let data = require("../stats.json")
+    let datFile = fs.readFileSync(path.join(__dirname, "/../stats.json"), 'utf8')
+    let data = JSON.parse(datFile)
 
     data.recentlangs.sort((a, b) => b.value - a.value)
 

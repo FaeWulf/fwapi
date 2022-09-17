@@ -312,6 +312,7 @@ module.exports = class bonsai {
                 let { dx, dy } = this.setDeltas(current_stack.type, current_stack.life, current_stack.age, this._config.multiplier)
 
                 if (dy > 0 && current_stack.y > (this._y - 10)) dy--; // reduce dy if too close to the ground
+                if (dx > 0 && current_stack.y < 5) dy++; // increase dy if too close to the limit height
 
                 // near-dead branch should branch into a lot of leaves
                 if (current_stack.life < 3) {
