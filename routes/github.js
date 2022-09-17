@@ -10,16 +10,6 @@ router.get("/github", (req, res) => {
 
     data.langs.sort((a, b) => b.value - a.value)
 
-    // ?recent=true
-    if (req.query.recent == true) {
-        let string = ""
-        data.recentlangs.forEach(K => {
-            string += `${K.key} (${K.value}%), `
-        })
-        string = string.slice(0, string.length - 2)
-        return res.send(string)
-    }
-
     let max = data.langs[0].value
 
     let els = ""
