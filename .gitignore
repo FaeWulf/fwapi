@@ -104,3 +104,6 @@ dist
 .tern-port
 
 stats.json
+deploy.sh
+fetch.sh
+log.txt
